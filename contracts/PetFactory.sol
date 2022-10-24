@@ -44,7 +44,7 @@ contract PetFactory is ERC721, Ownable {
       petsCounter = petsCounter.add(1);
     }
 
-    function createRandomPet(string memory _name, address player) public {
+    function _createRandomPet(string memory _name, address player) internal {
       require(msg.sender == _storeContract, "Only store contract can create a new pet");
       uint randomDNA = _generateRandomDna(_name);
       _craeteNewPet(_name, randomDNA, player);
