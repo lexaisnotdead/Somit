@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
 
+import "./Ownable.sol";
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 contract FoodForPets is ERC1155, Ownable {
-  constructor() ERC1155("") {}
+  constructor(address _gameContract) ERC1155("") Ownable(_gameContract) {}
 
   enum Foods {
     Banana,
@@ -20,7 +20,6 @@ contract FoodForPets is ERC1155, Ownable {
     uint8 foodType;
     uint8 healthyness;
   }
-
   
 
 }

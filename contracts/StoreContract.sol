@@ -2,38 +2,57 @@
 pragma solidity ^0.8.0;
 
 import "./PetFactory.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 abstract contract Store is PetFactory {
     using SafeMath for uint256;
 
-    mapping(uint=>uint) Items;
-    mapping(address=>uint) balances;
-
-    uint public itemsCount;
-    address public SMTaddress;
-
-    constructor(address _SMTaddress) {
-        itemsCount = 0;
-        SMTaddress = _SMTaddress;
+    struct ItemInfo {
+        bool exists;
+        uint price;
     }
 
-    function addItem(uint _price) public onlyOwner {
-        Items[itemsCount] = _price;
+    mapping(uint=>ItemInfo) itemToPrice;
+
+    IERC20 public SMTtoken;
+    uint public itemsCount;
+    uint public randomPetPrice;
+    uint public specificPetPrice;
+
+    constructor(IERC20 _SMTaddress, uint _randomPetPrice, uint _specificPetPrice) {
+        itemsCount = 0;
+        SMTtoken = _SMTaddress;
+        randomPetPrice = _randomPetPrice;
+        specificPetPrice = _specificPetPrice;
+    }
+
+    function addItem(uint _price) public onlyOwnerOrGame {
+        itemToPrice[itemsCount] = ItemInfo(true, _price);
         itemsCount.add(1);
     }
 
-    function modifyItem(uint _id, uint _newPrice) public onlyOwner {
-        require(Items[_id] > 0, "This item does not exist");
-        Items[_id] = _newPrice;
+    function modifyItem(uint _id, uint _newPrice) public onlyOwnerOrGame {
+        require(itemToPrice[_id].exists, "This item does not exist");
+        itemToPrice[_id] = ItemInfo(true, _newPrice);
     }
 
-    function buy(uint _id, string memory _name) public {
-        require(balances[msg.sender] >= Items[_id], "Insufficient Funds");
-        balances[msg.sender] -= Items[_id];
+    function buyRandomPet(string memory _name) public returns(uint) {
+        require(SMTtoken.transferFrom(msg.sender, address(this), randomPetPrice), "Insufficient funds");
 
-        _createRandomPet(_name, msg.sender);
+        return _createRandomPet(_name, msg.sender);
     }
+
+    function buySpecificPet(uint _dna, string memory _name) public returns(uint) {
+        require(SMTtoken.transferFrom(msg.sender, address(this), specificPetPrice), "Insufficient funds");
+
+        return _craeteNewPet(_name, _dna, msg.sender);
+    }
+
+    function purchase(uint _id) public returns(uint) {
+
+    }
+
+    
+
 }
