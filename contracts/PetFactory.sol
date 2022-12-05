@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.17;
 
 import "./Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
@@ -9,7 +9,7 @@ contract PetFactory is ERC721, Ownable {
     using SafeMath for uint256;
     uint256 public petsCounter;
 
-    constructor(string memory _name, string memory _symbol, address _gameContract) ERC721(_name, _symbol) Ownable(_gameContract) {
+    constructor(string memory _name, string memory _symbol) ERC721(_name, _symbol) Ownable() {
         petsCounter = 0;
     }
     
